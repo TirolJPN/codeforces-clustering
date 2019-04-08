@@ -1,9 +1,3 @@
-"""
-TODO:
-ngweightに入力するためのファイルを用意する
-「733」「633」の２つで試験する
-保存先のフォルダはfeature_word_vectorsとかにする
-"""
 import os
 import mysql.connector as cn
 from enum import  Enum
@@ -114,11 +108,7 @@ class FilesCreater(Connector):
         return ''.join(result)
 
 
-    """
-    problem_idを引数として、それに該当するソースコードの一覧をFileテーブルから取ってくる
-    コンテスト中、コンテスト外の全てのソースコードにおいて、
-    verdictがOKとなっているソースコードのみ対象
-    """
+
     def get_right_answers(self, problem_id):
         lang_list = ['GNU C++14', 'GNU C++11', 'GNU C++']
         lang_select = '(%s)' % ' or '.join(["lang='%s'" % lang for lang in lang_list])
