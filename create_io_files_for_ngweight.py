@@ -1,3 +1,5 @@
+# coding:utf-8
+
 import os
 import mysql.connector as cn
 from enum import  Enum
@@ -6,7 +8,7 @@ import re
 import subprocess
 import sys
 import key
-from ./../my_library/Connector import Connector
+from my_library import Connector
 
 """
 code from http://maku77.github.io/python/io/remove-java-comments.html
@@ -17,9 +19,7 @@ class State(Enum):
     CPP_COMMENT = 3
     STRING_LITERAL = 4
 
-"""
-problem_idを引数として、ngweight用の1つの入力ファイルを作成する
-"""
+
 class FilesCreater(Connector):
     def __init__(self, problem_id):
         super().__init__()
