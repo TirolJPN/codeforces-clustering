@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 import key
-from Connector import Connector
+from ./../my_library/Connector import Connector
 
 """
 code from http://maku77.github.io/python/io/remove-java-comments.html
@@ -17,18 +17,15 @@ class State(Enum):
     CPP_COMMENT = 3
     STRING_LITERAL = 4
 
-
-
+"""
+problem_idを引数として、ngweight用の1つの入力ファイルを作成する
+"""
 class FilesCreater(Connector):
-    """
-    problem_idを引数として、ngweight用の1つの入力ファイルを作成する
-    """
     def __init__(self, problem_id):
         super().__init__()
         PATH_FEATURE_WORD_VECTORS = key.PATH_FEATURE_WORD_VECTORS
         PATH_SRC = key.PATH_SRC
         path_file = PATH_FEATURE_WORD_VECTORS + problem_id + '.txt'
-
         # 入力ファイルがまだ作成されていなければ実行する
         if not os.path.isfile(path_file):
             answers = self.get_right_answers(problem_id)
@@ -46,7 +43,7 @@ class FilesCreater(Connector):
                     # 特殊記号をとりあえず空白に変換する
                     # processed_s = re.sub("\!|\?|\"|\'|#|\$|%|&|\||\(|\)|\{|\}|\[|\]|=|<|>|\+|-|\*|\/|\\|\~|\^|@|:|;|,|\.|\s+", " ", s)
                     processed_s = re.sub("\s+", " ", s)
-                    # 上記置換だと、改行・スペースのスペース変換による連続スペースが残るので、それらも一つのスペースにする
+                    #改行・スペースのスペース変換による連続スペースが残るので、それらも一つのスペースにする
                     processed_s = re.sub(r" +", " ", processed_s)
                     f_ngweight.write(processed_s)
             # pythonスクリプトからngweightを直接実行し、出力ファイルを得る
@@ -108,7 +105,6 @@ class FilesCreater(Connector):
         return ''.join(result)
 
 
-
     def get_right_answers(self, problem_id):
         lang_list = ['GNU C++14', 'GNU C++11', 'GNU C++']
         lang_select = '(%s)' % ' or '.join(["lang='%s'" % lang for lang in lang_list])
@@ -116,14 +112,11 @@ class FilesCreater(Connector):
         return super().exec_select_sql(sql)
 
 
-
 def main():
     args = sys.argv
-    # 引数がなければそのまま終了
     if len(args) != 1:
         for problem_id in args[1:]:     
             FilesCreater(problem_id)
-
 
 
 if __name__ == '__main__':

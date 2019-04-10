@@ -5,7 +5,7 @@ ngweightでで作成した特徴語のリストから、そのN-gramの種類の
 クラスタリング・可視化は別のスクリプトで行う。
 pythonにおける階層クラスタリングは次を参照 https://qiita.com/suecharo/items/20bad5f0bb2079257568
 問題の種類によっては次元数がアホみたいなことになるが、気にしないでとりあえず実行する
-クラスタリング手法には最長距離法、メトリクスにはコサイン類似度(コサイン距離？)を用いる
+クラスタリング手法には最長距離法、メトリクスにはコサイン類似度(コサイン距離)を用いる
 
 ある一つの問題ごとに以下を実行する
 1. 入力ファイル(input_files/hoge.txt)を参照する。1解答ごとに
@@ -27,8 +27,9 @@ import csv
 import key
 from Connector import Connector
 
-
-
+"""
+出現した特徴N-gramの数をカウントする
+"""
 class VectorCreater(Connector):
     """
     problem_idを引数として、前解答の特徴ベクトルの情報を持つCSVファイルを作成する
@@ -37,9 +38,7 @@ class VectorCreater(Connector):
         self.PATH_INPUT_FILES = key.PATH_INPUT_FILES
         self.PATH_OUTPUT_FILES = key.PATH_OUTPUT_FILES
         self.PATH_VECTOR_FILES = key.PATH_VECTOR_FILES
-
         keywords_list = self.get_keywords_list(problem_id)
-
         # N-gram一覧の取得に成功したら
         vector_csv_path = self.PATH_VECTOR_FILES + problem_id + '.csv'
         if (keywords_list != False):
@@ -102,7 +101,6 @@ class VectorCreater(Connector):
                     n_gram_count_list.append(count)
                 writer.writerow(n_gram_count_list)
 
-            
 
 def main():
     args = sys.argv
@@ -110,7 +108,6 @@ def main():
         for problem_id in args[1:]:
             VectorCreater(problem_id)
         
-
 
 if __name__ == '__main__':
     main()
