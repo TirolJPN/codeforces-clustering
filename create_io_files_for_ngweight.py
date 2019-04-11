@@ -47,7 +47,7 @@ class FilesCreater(Connector.Connector):
                     processed_s = re.sub(r" +", " ", processed_s)
                     f_ngweight.write(processed_s)
             # pythonスクリプトからngweightを直接実行し、出力ファイルを得る
-            cmd = "../../ngweight/bin/default/ngweight -w -s 0 < ../outputs/input_files/%s.txt > ../outputs/output_files/%s_output" % (problem_id, problem_id)
+            cmd = "../../2018-research/ngweight/bin/default/ngweight -w -s 0 < ../clustering_result/ngweight_input_files/%s.txt > ../clustering_result/ngweight_output_files/%s_output" % (problem_id, problem_id)
             res = subprocess.run([cmd], stdout=subprocess.PIPE, shell=True)
             sys.stdout.buffer.write(res.stdout)
 
