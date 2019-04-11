@@ -1,5 +1,5 @@
 import mysql.connector as cn
-import key
+from . import key
 
 class Connector:
     # コンストラクタでコネクターを用意する

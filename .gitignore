@@ -1,4 +1,5 @@
 ./__pycache__/
-./.env
+my_library/__pycache__/
+my_library/.env
 sql_memo.txt
 venv/

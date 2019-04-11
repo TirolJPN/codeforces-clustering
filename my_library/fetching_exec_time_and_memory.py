@@ -7,7 +7,6 @@
 
 import os
 import mysql.connector as cn
-from pyquery import PyQuery as pq
 import sys
 import requests 
 

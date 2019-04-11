@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import re
 import subprocess
 import sys
-import key
+from my_library import key
 from my_library import Connector
 
 """
@@ -20,7 +20,7 @@ class State(Enum):
     STRING_LITERAL = 4
 
 
-class FilesCreater(Connector):
+class FilesCreater(Connector.Connector):
     def __init__(self, problem_id):
         super().__init__()
         PATH_FEATURE_WORD_VECTORS = key.PATH_FEATURE_WORD_VECTORS
