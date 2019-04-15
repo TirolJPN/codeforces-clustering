@@ -7,7 +7,7 @@ pythonにおける階層クラスタリングは次を参照 https://qiita.com/s
 問題の種類によっては次元数がアホみたいなことになるが、気にしないでとりあえず実行する
 クラスタリング手法には最長距離法、メトリクスにはコサイン類似度(コサイン距離)を用いる
 
-ある一つの問題ごとに以下を実行する
+引数のproblem_idごとに以下を実行する
 1. 入力ファイル(input_files/hoge.txt)を参照する。1解答ごとに
     0x02[file_name]0x03 {単語群} 0x02[file_name]0x03 {単語群} 0x02[file_name]0x03 {単語群}...
     の形式になっているので、0x02[file_name]0x03を区切りに、1解答づつの文章を取得
@@ -25,12 +25,13 @@ import subprocess
 import sys
 import csv
 from my_library import key
-from Connector import Connector
+from my_library import Connector
+
 
 """
 出現した特徴N-gramの数をカウントする
 """
-class VectorCreater(Connector):
+class VectorCreater(Connector.Connector):
     """
     problem_idを引数として、前解答の特徴ベクトルの情報を持つCSVファイルを作成する
     """

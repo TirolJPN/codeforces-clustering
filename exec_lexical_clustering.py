@@ -28,7 +28,6 @@ sys.setrecursionlimit(10000)
 
 class ExecLexicalCluster(Connector):
     # problem_idを引数にして、クラスタリングを実行する
-    # 改善の余地あり
     def __init__(self, problem_id):
         super().__init__()
 
