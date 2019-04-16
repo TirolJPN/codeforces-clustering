@@ -20,8 +20,8 @@ from pandas.plotting import scatter_matrix
 from scipy.cluster.hierarchy import linkage, dendrogram
 import numpy as np
 from scipy.cluster.hierarchy import fcluster
-import key
-from Connector import Connector
+from my_library.Connector import Connector
+from my_library import key
 
 sys.setrecursionlimit(10000)
 
@@ -31,30 +31,29 @@ class ExecLexicalCluster(Connector):
     def __init__(self, problem_id):
         super().__init__()
 
-        self.make_directories(problem_id)
-
         PATH_VECTOR_FILES = key.PATH_VECTOR_FILES
         PATH_PLOT_RESULTS = key.PATH_PLOT_RESULTS
         NUM_LEXICAL_CLUSTERS = key.NUM_LEXICAL_CLUSTERS
 
-        # metrics = ['cosine']
-        # normal_methods = ['complete', 'weighted']
+        # make_directory()でも同様のディレクトリを用意するためにインスタンス変数に実行するmethod・metricを格納
+        # self.metrics = ['cosine']
+        # self.metrics = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', 'jaccard']
+        self.metrics = ['cosine']
+        self.normal_methods = ['single', 'average', 'complete', 'weighted']
+        self.euclidean_methods = ['single', 'average', 'complete', 'weighted', 'centroid', 'median', 'ward']
 
-        # metrics = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', 'jaccard']
-        metrics = ['cosine']
-        normal_methods = ['single', 'average', 'complete', 'weighted']
-        euclidean_methods = ['single', 'average', 'complete', 'weighted', 'centroid', 'median', 'ward']
+        self.make_directories(problem_id)
 
         path_csv_file = PATH_VECTOR_FILES + problem_id + '.csv'
         df = pd.read_csv(path_csv_file, delimiter=",", )
         length_culumns = len(df.columns)
         x = df.iloc[:,1:length_culumns]
 
-        for metric in metrics:
+        for metric in self.metrics:
             if metric != 'euclidean':
-                methods = normal_methods
+                methods = self.normal_methods
             else:
-                methods = euclidean_methods
+                methods = self.euclidean_methods
             for method in methods:
                 try:
 
@@ -65,18 +64,6 @@ class ExecLexicalCluster(Connector):
                     result = linkage(x,
                                     metric = metric,
                                     method = method)
-                    """
-                    dendrogram(result)
-                    fancy_dendrogram(
-                        result,
-                        truncate_mode='lastp',  # show only the last p merged clusters
-                        p=20,  # show only the last p merged clusters
-                        leaf_rotation=90.,
-                        leaf_font_size=12.,
-                        show_contracted=True,  # to get a distribution impression in truncated branches
-                        annotate_above=10,  # useful in small plots so annotations don't overlap
-                    )
-                    """
                     dendrogram(
                         result,
                         truncate_mode='lastp',  # show only the last p merged clusters
@@ -85,17 +72,17 @@ class ExecLexicalCluster(Connector):
                         leaf_font_size=12.,
                         show_contracted=True,  # to get a distribution impression in truncated branches
                     )
-                    # fcluster()で、クラスタ数指定でクラスタ分類する
                     cluster_index = fcluster(result, NUM_LEXICAL_CLUSTERS, criterion='maxclust')
-                    print(cluster_index)
-                    plt.title("Dedrogram")
-                    plt.ylabel("Threshold")
-                    plot_file_name = '%s%s/%s/%s/%s.png' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
-                    plt.savefig(plot_file_name, dpi = 1000)
-                    plt.clf()
+                    # plt.title("Dedrogram")
+                    # plt.ylabel("Threshold")
+                    # plot_file_name = '%s%s/%s/%s/%s.png' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+                    # plt.savefig(plot_file_name, dpi = 1000)
+                    # plt.clf()
                     
                     path_cluster_index = '%s%s/%s/%s/%s.npy' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
                     np.save(path_cluster_index, cluster_index)
+                    path_cluster_index_log = '%s%s/%s/%s/%s.txt' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+                    print(cluster_index)
                 except Exception as e:
                     print(e)
                     continue
@@ -105,15 +92,12 @@ class ExecLexicalCluster(Connector):
     def make_directories(self, problem_id):
         PATH_PLOT_RESULTS = "%s%s/" % ( key.PATH_PLOT_RESULTS , problem_id)
         # デンドログラムの結果を保存するディレクトリの作成
-        # metrics = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', 'jaccard']
-        metrics = ['cosine']
-        normal_methods = ['single', 'average', 'complete', 'weighted']
-        euclidean_methods = ['single', 'average', 'complete', 'weighted', 'centroid', 'median', 'ward']
-        for metric in metrics:
+
+        for metric in self.metrics:
             if metric != 'euclidean':
-                methods = normal_methods
+                methods = self.normal_methods
             else:
-                methods = euclidean_methods
+                methods = self.euclidean_methods
             for method in methods:
                 plot_file_name = '%s%s/%s/' % (PATH_PLOT_RESULTS, metric, method)
                 if not os.path.exists(plot_file_name):
