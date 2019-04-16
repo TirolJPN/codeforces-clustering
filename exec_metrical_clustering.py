@@ -32,22 +32,11 @@ import numpy as np
 from scipy.cluster.hierarchy import fcluster
 import shutil
 import glob
-import key
+from my_library import key
 
 
 
 class ExecMetricalCluster():
-    PATH_SRC = key.PATH_SRC
-    PATH_LEXICAL_INDEXED_SRC = key.PATH_LEXICAL_INDEXED_SRC
-    PATH_METRICAL_INDEXED_SRC = key.PATH_METRICAL_INDEXED_SRC
-    PATH_METRIC_VALUES = key.PATH_METRIC_VALUES
-    NUM_LEXICAL_CLUSTERS = key.NUM_LEXICAL_CLUSTERS
-    NUM_METRICAL_CLUSTERS = key.NUM_METRICAL_CLUSTERS
-
-    # metrics = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', 'jaccard']
-    metrics = ['cosine']
-    normal_methods = ['single', 'average', 'complete', 'weighted']
-    euclidean_methods = ['single', 'average', 'complete', 'weighted', 'centroid', 'median', 'ward']
 
     def __init__(self, problem_id):
         """
@@ -61,66 +50,84 @@ class ExecMetricalCluster():
 
 
         super().__init__()
-        self.make_directory(problem_id)
+
+        self.PATH_SRC = key.PATH_SRC
+        self.PATH_LEXICAL_INDEXED_SRC = key.PATH_LEXICAL_INDEXED_SRC
+        self.PATH_METRICAL_INDEXED_SRC = key.PATH_METRICAL_INDEXED_SRC
+        self.PATH_METRIC_VALUES = key.PATH_METRIC_VALUES
+        self.PATH_PLOT_RESULTS = key.PATH_PLOT_RESULTS
+        self.NUM_LEXICAL_CLUSTERS = key.NUM_LEXICAL_CLUSTERS
+        self.NUM_METRICAL_CLUSTERS = key.NUM_METRICAL_CLUSTERS
+
+        # metrics = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', 'jaccard']
+        metrics = ['cosine']
+        normal_methods = ['single', 'average', 'complete', 'weighted']
+        euclidean_methods = ['single', 'average', 'complete', 'weighted', 'centroid', 'median', 'ward']
 
         clusters = range(1, self.NUM_LEXICAL_CLUSTERS+1)
         metric_clusters = range(1, self.NUM_METRICAL_CLUSTERS+1)
-        # メトリックスで未分類の問題について
-        for metric in self.metrics:
+        for metric in metrics:
             if metric != 'euclidean':
-                methods = self.normal_methods
+                methods = normal_methods
             else:
-                methods = self.euclidean_methods
+                methods = euclidean_methods
+
             for method in methods:
-                for num_cluster in clusters:
-                    # そのディレクトリに存在するファイル名の一覧を取得する
-                    # 現在のループでフォルダが存在すれば
-                    path_cluster = '%s%s/%s/%s/%s/'% (self.PATH_LEXICAL_INDEXED_SRC, problem_id, metric, method, str(num_cluster))
-                    if os.path.exists(path_cluster):
-                        print(path_cluster)
-                        path_cluster = '%s%s/%s/%s/%s/*'% (self.PATH_LEXICAL_INDEXED_SRC, problem_id, metric, method, str(num_cluster))
-                        src_list = [os.path.basename(r) for r in glob.glob(path_cluster)]
 
-                        # src_listに存在するcsvの行だけ、dfに入れる
-                        path_metric_csv = '%s%s.csv' % (self.PATH_METRIC_VALUES, problem_id)
+                for lexical_cluster in clusters:
 
-                        # 探索対象のdfをこれに追加していく
-                        data_frame = pd.DataFrame(index=[], columns=['file_name', 'M0', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M9', 'M11', 'M12', 'M13', 'M14'])
+                    # path_cluster = '%s%s/%s/%s/%s/*'% (self.PATH_LEXICAL_INDEXED_SRC, problem_id, metric, method, str(lexical_cluster))
+                    # src_list = [os.path.basename(r) for r in glob.glob(path_cluster)]
+                    src_list, src_index = self.get_src_list(problem_id, metric, method, lexical_cluster)
 
-                        src_list_df = []
-                        with open(path_metric_csv, "r", encoding="utf-8") as csv_file:
-                            f = csv.reader(csv_file, delimiter=",",  lineterminator='\n')
-                            next(f)
-                            for csv_row in f:
-                                tmp_file_name = '%s_%s_%s.src' % (csv_row[0], csv_row[1], csv_row[2])
-                                # ディレクトリに注目している行のファイルが存在すれば
-                                # print(tmp_file_name)
-                                if tmp_file_name in src_list:
-                                    # 全要素が0だと類似度が計算できないので除外する
-                                    tmp_metric_list = [csv_row[3], csv_row[4], csv_row[5], csv_row[6], csv_row[7], csv_row[8], csv_row[9], csv_row[12], csv_row[14], csv_row[15], csv_row[16], csv_row[17]]
-                                    if not all(str(int(float(elem))) == '0' for elem in tmp_metric_list):
-                                        if any('+' in elem for elem in tmp_metric_list):
-                                            src_list.remove(tmp_file_name)
-                                        else:
-                                            # listのextend()はNoneを返す
-                                            # metric_list = [tmp_file_name].extend(tmp_metric_list)
-                                            metric_list = [tmp_file_name]
-                                            metric_list.extend(tmp_metric_list)
-                                            series = pd.Series(metric_list, index=data_frame.columns)
-                                            data_frame = data_frame.append(series, ignore_index = True)
-                                            src_list_df.append(tmp_file_name)
+                    # src_listに存在するcsvの行だけ、dfに入れる
+                    path_metric_csv = '%s%s.csv' % (self.PATH_METRIC_VALUES, problem_id)
+
+                    # 探索対象のdfをこれに追加していく
+                    data_frame = pd.DataFrame(index=[], columns=['file_name', 'M0', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M9', 'M11', 'M12', 'M13', 'M14'])
+
+                    src_list_df = []
+                    success_clustering_flag = True
+                    with open(path_metric_csv, "r", encoding="utf-8") as csv_file:
+                        f = csv.reader(csv_file, delimiter=",",  lineterminator='\n')
+                        next(f)
+                        for csv_row in f:
+                            tmp_file_name = '%s_%s_%s.src' % (csv_row[0], csv_row[1], csv_row[2])
+                            # ディレクトリに注目している行のファイルが存在すれば
+                            # print(tmp_file_name)
+                            if tmp_file_name in src_list:
+                                # 全要素が0だと類似度が計算できないので除外する
+                                tmp_metric_list = [csv_row[3], csv_row[4], csv_row[5], csv_row[6], csv_row[7], csv_row[8], csv_row[9], csv_row[12], csv_row[14], csv_row[15], csv_row[16], csv_row[17]]
+                                if not all(str(int(float(elem))) == '0' for elem in tmp_metric_list):
+                                    if any('+' in elem for elem in tmp_metric_list):
+                                        # src_list.remove(tmp_file_name)
+                                        success_clustering_flag = False
                                     else:
-                                        src_list.remove(tmp_file_name)
-                        # クラスタリングの結果のラベルが帰ってくる
-                        # exec_clustering()と同様にコピーを実行する
-                        # ex. label が[1,2,3,2,1,2], src_listが['aaaa.src', 'hoge.src'. 'fuga.src']みたいな形なので、順序が同じことを前提にコピー
-                        # print(data_frame)
-                        # csv上にあり，src_list上だけに存在する要素を削除する
-                
-                        label = self.get_fcluster_result(data_frame, metric, method, num_cluster, problem_id)
+                                        # listのextend()はNoneを返す
+                                        # metric_list = [tmp_file_name].extend(tmp_metric_list)
+                                        metric_list = [tmp_file_name]
+                                        metric_list.extend(tmp_metric_list)
+                                        series = pd.Series(metric_list, index=data_frame.columns)
+                                        data_frame = data_frame.append(series, ignore_index = True)
+                                        src_list_df.append(tmp_file_name)
+                                else:
+                                    # src_list.remove(tmp_file_name)
+                                    success_clustering_flag = False
+
+                    # クラスタリングの結果のラベルが帰ってくる
+                    # exec_clustering()と同様にコピーを実行する
+                    # ex. label が[1,2,3,2,1,2], src_listが['aaaa.src', 'hoge.src'. 'fuga.src']みたいな形なので、順序が同じことを前提にコピー
+                    # print(data_frame)
+                    # csv上にあり，src_list上だけに存在する要素を削除する
+                    if(success_clustering_flag):
+                        label = self.get_fcluster_result(data_frame, metric, method, lexical_cluster, problem_id)
                         print('len srclistdf: %d len label: %d' % (len(src_list_df), len(label)))
-                        self.exec_copy(src_list_df, label, metric, method, num_cluster, problem_id)
+                        self.update_clustering_csv(src_list, label, metric, method, lexical_cluster, problem_id, src_index)
+                        # 直コピーを無くす
+                        # self.exec_copy(src_list_df, label, metric, method, lexical_cluster, problem_id)
                         print('-----------------------------------------------------------')
+                    else:
+                        self.update_clustering_csv(src_list, [-1]*len(src_list), metric, method, lexical_cluster, problem_id, src_index)
 
 
     def get_fcluster_result(self, df, metric, method, cluster, problem_id):
@@ -140,60 +147,56 @@ class ExecMetricalCluster():
                         show_contracted=True,  # to get a distribution impression in truncated branches
                     )
             cluster_index = fcluster(result, self.NUM_METRICAL_CLUSTERS, criterion='maxclust')
-            print(cluster_index)
-            plt.title("Dedrogram")
-            plt.ylabel("Threshold")
-            plot_file_name = '%s%s/%s/%s/%s/cluster.png' %(self.PATH_METRICAL_INDEXED_SRC, problem_id, metric, method, str(cluster))
-            plt.savefig(plot_file_name, dpi = 1000)
-            plt.clf()
             
             return cluster_index
         else:
             return [1]
+    
 
-
-
-
-    def exec_copy(self, src_list, label, metric, method, num_cluster, problem_id):
+    def update_clustering_csv(self, src_list, label, metric, method, lexical_cluster, problem_id, src_index):
+        path_cluster_index_csv = '%s%s/%s/%s/%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+        df = pd.read_csv(path_cluster_index_csv)
         index = 0
         for src_name in src_list:
-            path_src_file = '%s%s' % (self.PATH_SRC, src_name)
-            if os.path.exists(path_src_file):
-                try:
-                    path_copy_src_file = '%s/%s/%s/%s/%s/%s/%s' % (self.PATH_METRICAL_INDEXED_SRC, problem_id, metric, method, num_cluster ,  label[index], src_name)
-                    shutil.copy(path_src_file, path_copy_src_file)
-                    index = index + 1
-                except Exception as e:
-                    print(e)
-                    index = index + 1
-                    continue
+            df.at[src_name, 'metrical_id'] = label[index]
+        df.to_csv(path_cluster_index_csv)
+
+
+    # def exec_copy(self, src_list, label, metric, method, num_cluster, problem_id):
+    #     index = 0
+    #     for src_name in src_list:
+    #         path_src_file = '%s%s' % (self.PATH_SRC, src_name)
+    #         if os.path.exists(path_src_file):
+    #             try:
+    #                 path_copy_src_file = '%s/%s/%s/%s/%s/%s/%s' % (self.PATH_METRICAL_INDEXED_SRC, problem_id, metric, method, num_cluster ,  label[index], src_name)
+    #                 shutil.copy(path_src_file, path_copy_src_file)
+    #                 index = index + 1
+    #             except Exception as e:
+    #                 print(e)
+    #                 index = index + 1
+    #                 continue
+
+
+
+    # 引数のlexical_clusterに対応するファイル名の一覧を返す
+    def get_src_list(self, problem_id, metric, method, lexical_cluster):
+        path_cluster_index_csv = '%s%s/%s/%s/%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+        with open(path_cluster_index_csv, mode="r", encoding='utf-8') as f_csv:
+            reader = csv.reader(f_csv)
+            header = next(reader)
+            file_list = []
+            file_index = []
+            row_index = 0 
+            for row in reader:
+                print(row)
+                if (row[2] == lexical_cluster):
+                    file_list.append(row[1])
+                    file_index.append(row_index)
+                    row_index += 1
+        return file_list, file_index
+
 
                             
-
-
-    # コピー先のディレクトリが存在しなければ作成する
-    # 最終的な結果はPATH_METRICAL_INDEXED_SRC先にコピーする
-    # この処理はproblem_idごとに行う
-    def make_directory(self, problem_id):
-        # metrics = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', 'jaccard']
-        metrics = ['cosine']
-        normal_methods = ['single', 'average', 'complete', 'weighted']
-        euclidean_methods = ['single', 'average', 'complete', 'weighted', 'centroid', 'median', 'ward']
-        clusters = range(1, self.NUM_LEXICAL_CLUSTERS+1)
-        metric_clusters = range(1, self.NUM_METRICAL_CLUSTERS+1)
-        for cluster in clusters:
-            for metric_cluster in metric_clusters:
-                for metric in metrics:
-                    if metric != 'euclidean':
-                        methods = normal_methods
-                    else:
-                        methods = euclidean_methods
-                    for method in methods:
-                        path_cluster = '%s%s/%s/%s/%s/%s'% (self.PATH_METRICAL_INDEXED_SRC, problem_id, metric, method, str(cluster), str(metric_cluster))
-                        if not os.path.exists(path_cluster):
-                            os.makedirs(path_cluster)
-
-
 
 def main():
     args = sys.argv

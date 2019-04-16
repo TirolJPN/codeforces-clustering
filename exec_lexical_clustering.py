@@ -31,9 +31,9 @@ class ExecLexicalCluster(Connector):
     def __init__(self, problem_id):
         super().__init__()
 
-        PATH_VECTOR_FILES = key.PATH_VECTOR_FILES
-        PATH_PLOT_RESULTS = key.PATH_PLOT_RESULTS
-        NUM_LEXICAL_CLUSTERS = key.NUM_LEXICAL_CLUSTERS
+        self.PATH_VECTOR_FILES = key.PATH_VECTOR_FILES
+        self.PATH_PLOT_RESULTS = key.PATH_PLOT_RESULTS
+        self.NUM_LEXICAL_CLUSTERS = key.NUM_LEXICAL_CLUSTERS
 
         # make_directory()でも同様のディレクトリを用意するためにインスタンス変数に実行するmethod・metricを格納
         # self.metrics = ['cosine']
@@ -44,7 +44,7 @@ class ExecLexicalCluster(Connector):
 
         self.make_directories(problem_id)
 
-        path_csv_file = PATH_VECTOR_FILES + problem_id + '.csv'
+        path_csv_file = self.PATH_VECTOR_FILES + problem_id + '.csv'
         df = pd.read_csv(path_csv_file, delimiter=",", )
         length_culumns = len(df.columns)
         x = df.iloc[:,1:length_culumns]
@@ -72,17 +72,13 @@ class ExecLexicalCluster(Connector):
                         leaf_font_size=12.,
                         show_contracted=True,  # to get a distribution impression in truncated branches
                     )
-                    cluster_index = fcluster(result, NUM_LEXICAL_CLUSTERS, criterion='maxclust')
-                    # plt.title("Dedrogram")
-                    # plt.ylabel("Threshold")
-                    # plot_file_name = '%s%s/%s/%s/%s.png' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
-                    # plt.savefig(plot_file_name, dpi = 1000)
-                    # plt.clf()
+                    # このfcluster()の返り値のリストの各要素の順番は生データの順番と同じ
+                    cluster_index = fcluster(result, self.NUM_LEXICAL_CLUSTERS, criterion='maxclust')
                     
-                    path_cluster_index = '%s%s/%s/%s/%s.npy' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+                    path_cluster_index = '%s%s/%s/%s/%s.npy' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
                     np.save(path_cluster_index, cluster_index)
-                    path_cluster_index_log = '%s%s/%s/%s/%s.txt' % (PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
                     print(cluster_index)
+                    self.make_index_csv(problem_id, metric, method, df.iloc[:,0:1], cluster_index)
                 except Exception as e:
                     print(e)
                     continue
@@ -99,9 +95,24 @@ class ExecLexicalCluster(Connector):
             else:
                 methods = self.euclidean_methods
             for method in methods:
-                plot_file_name = '%s%s/%s/' % (PATH_PLOT_RESULTS, metric, method)
+                plot_file_name = '%s%s/%s/' % (self.PATH_PLOT_RESULTS, metric, method)
                 if not os.path.exists(plot_file_name):
-                    os.makedirs(plot_file_name)    
+                    os.makedirs(plot_file_name)
+    
+    # submission_id, lexical_index, metrical_indexの列を持つcsvを各ディレクトリで作成し、更新する
+    def make_index_csv(self, problem_id, metric, method, src_list, cluster_index):
+        path_cluster_index_csv = '%s%s/%s/%s/%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+        with open(path_cluster_index_csv, mode="w", encoding='utf-8') as f_csv:
+            writer = csv.writer(f_csv, lineterminator='\n')
+            header = ['submmission_id', 'lexical_id', 'metrical_id']
+            writer.writerow(header)
+            for i in range(0, len(src_list)):
+                filename_and_lexical_clustering_id = []
+                filename_and_lexical_clustering_id.append(src_list['submission_id'][i])
+                filename_and_lexical_clustering_id.append(cluster_index[i])
+                writer.writerow(filename_and_lexical_clustering_id)
+
+
 
 
 
