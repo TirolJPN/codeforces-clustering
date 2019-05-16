@@ -95,7 +95,7 @@ class ExecLexicalCluster(Connector):
             else:
                 methods = self.euclidean_methods
             for method in methods:
-                plot_file_name = '%s%s/%s/' % (self.PATH_PLOT_RESULTS, metric, method)
+                plot_file_name = '%s%s/%s/' % (PATH_PLOT_RESULTS, metric, method)
                 if not os.path.exists(plot_file_name):
                     os.makedirs(plot_file_name)
     

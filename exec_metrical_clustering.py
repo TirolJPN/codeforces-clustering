@@ -123,7 +123,6 @@ class ExecMetricalCluster():
                         label = self.get_fcluster_result(data_frame, metric, method, lexical_cluster, problem_id)
                         print('len srclistdf: %d len label: %d' % (len(src_list_df), len(label)))
                         self.update_clustering_csv(src_list, label, metric, method, lexical_cluster, problem_id, src_index)
-                        # 直コピーを無くす
                         # self.exec_copy(src_list_df, label, metric, method, lexical_cluster, problem_id)
                         print('-----------------------------------------------------------')
                     else:
@@ -159,7 +158,8 @@ class ExecMetricalCluster():
         index = 0
         for src_name in src_list:
             df.at[src_name, 'metrical_id'] = label[index]
-        df.to_csv(path_cluster_index_csv)
+        # df.to_csv(path_cluster_index_csv, columns=['metrical_id'])
+        print(label)
 
 
     # def exec_copy(self, src_list, label, metric, method, num_cluster, problem_id):
@@ -188,15 +188,13 @@ class ExecMetricalCluster():
             file_index = []
             row_index = 0 
             for row in reader:
-                print(row)
-                if (row[2] == lexical_cluster):
+                if (row[1] == lexical_cluster):
                     file_list.append(row[1])
                     file_index.append(row_index)
                     row_index += 1
         return file_list, file_index
 
 
-                            
 
 def main():
     args = sys.argv
