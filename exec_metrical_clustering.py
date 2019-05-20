@@ -162,20 +162,6 @@ class ExecMetricalCluster():
         print(label)
 
 
-    # def exec_copy(self, src_list, label, metric, method, num_cluster, problem_id):
-    #     index = 0
-    #     for src_name in src_list:
-    #         path_src_file = '%s%s' % (self.PATH_SRC, src_name)
-    #         if os.path.exists(path_src_file):
-    #             try:
-    #                 path_copy_src_file = '%s/%s/%s/%s/%s/%s/%s' % (self.PATH_METRICAL_INDEXED_SRC, problem_id, metric, method, num_cluster ,  label[index], src_name)
-    #                 shutil.copy(path_src_file, path_copy_src_file)
-    #                 index = index + 1
-    #             except Exception as e:
-    #                 print(e)
-    #                 index = index + 1
-    #                 continue
-
 
 
     # 引数のlexical_clusterに対応するファイル名の一覧を返す
