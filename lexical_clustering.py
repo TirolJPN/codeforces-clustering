@@ -5,7 +5,7 @@ import csv
 import pandas as pd
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.cluster.hierarchy import fcluster
-
+import numpy as np
 
 class ExecLexicalCluster():
     def __init__(self, problem_id):
@@ -23,19 +23,6 @@ class ExecLexicalCluster():
         df = pd.read_csv(path_csv_file, delimiter=",", )
         length_culumns = len(df.columns)
         x = df.iloc[:,1:length_culumns]
-
-        # ここでdfのフィルタリングが必要
-        # メトリクス値がcsv内になければクラスタリング対象外にする
-        PATH_METRIC_VALUES_CSV = "%s%s.csv" % (self.PATH_METRIC_VALUES, problem_id)
-        submission_id_list = []
-        with open(PATH_METRIC_VALUES_CSV, "r", encoding="utf-8") as metric_values_csv:
-            f = csv.reader(metric_values_csv, delimiter=",", lineterminator="\n")
-            h = next(f)
-            for row in f:
-                # submission_idはrow[1]で取得できる
-                submission_id_list.append(row[1])
-
-        print(df["submission_id"])
 
 
         for metric in self.METRICS:
@@ -59,10 +46,10 @@ class ExecLexicalCluster():
                     )
                     cluster_index = fcluster(result, self.NUM_LEXICAL_CLUSTERS, criterion='maxclust')
                     
-                    # path_cluster_index = '%s%s/%s/%s/%s.npy' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
-                    # np.save(path_cluster_index, cluster_index)
-                    # print(cluster_index)
-                    # self.make_index_csv(problem_id, metric, method, df.iloc[:,0:1], cluster_index)
+                    path_cluster_index = '%s%s/%s/%s/%s.npy' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+                    np.save(path_cluster_index, cluster_index)
+                    print(cluster_index)
+                    self.make_index_csv(problem_id, metric, method, df.iloc[:,0:1], cluster_index)
                 except Exception as e:
                     print(e)
                     continue
@@ -76,8 +63,16 @@ class ExecLexicalCluster():
                     os.makedirs(result_path)
 
     def make_index_csv(self, problem_id, metric, method, src_list, cluster_index):
-        return True
-
+        path_cluster_index_csv = '%s%s/%s/%s/lexicalresult_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+        with open(path_cluster_index_csv, mode="w", encoding="utf-8") as f_csv:
+            writer = csv.writer(f_csv, lineterminator='\n')
+            header = ['submission_id', 'lexical_id']
+            writer.writerow(header)
+            for i in range(0, len(src_list)):
+                additional_row = []
+                additional_row.append(src_list['submission_id'][i])
+                additional_row.append(cluster_index[i])
+                writer.writerow(additional_row)
 
 def main():
     args = sys.argv
