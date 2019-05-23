@@ -26,7 +26,8 @@ import sys
 import csv
 from my_library import key
 from my_library import Connector
-
+import pandas as pd
+from itertools import chain
 
 """
 出現した特徴N-gramの数をカウントする
@@ -39,6 +40,7 @@ class VectorCreater(Connector.Connector):
         self.PATH_INPUT_FILES = key.PATH_INPUT_FILES
         self.PATH_OUTPUT_FILES = key.PATH_OUTPUT_FILES
         self.PATH_VECTOR_FILES = key.PATH_VECTOR_FILES
+        self.PATH_METRIC_VALUES = key.PATH_METRIC_VALUES
         keywords_list = self.get_keywords_list(problem_id)
         # N-gram一覧の取得に成功したら
         vector_csv_path = self.PATH_VECTOR_FILES + problem_id + '.csv'
@@ -86,6 +88,12 @@ class VectorCreater(Connector.Connector):
     """
     def create_keyword_vectors(self, problem_id, n_gram_list, writer):
         input_file_path = self.PATH_INPUT_FILES + problem_id + '.txt'
+
+        path_metric_values_csv = '%s%s.csv' % (self.PATH_METRIC_VALUES, problem_id)
+        df = pd.read_csv(path_metric_values_csv, usecols=[1])
+        target_submission_ids = list(chain.from_iterable(df.values.tolist()))
+        # source monoitorの計測値があるsubmission_idの一覧を取得
+
         # ファイルが存在するならば
         if os.path.isfile(input_file_path):
             with open(input_file_path, 'r', encoding='utf-8') as f_input_file:
@@ -93,14 +101,19 @@ class VectorCreater(Connector.Connector):
             splited_code_contents = [i for i in re.split(chr(2), code_contents ) if i != '']
             for splited_code_content in splited_code_contents:
                 tmp = splited_code_content.split(chr(3))
-                file_name = tmp[0]
-                code = tmp[1]
-                # n-gramごとに探索する
-                n_gram_count_list = [file_name]
-                for n_gram in n_gram_list:
-                    count = code.count(n_gram)
-                    n_gram_count_list.append(count)
-                writer.writerow(n_gram_count_list)
+
+                file_name = tmp[0].split('_')[-2]
+
+                if int(file_name) in target_submission_ids:
+                    code = tmp[1]
+                    # n-gramごとに探索する
+                    n_gram_count_list = [file_name]
+                    for n_gram in n_gram_list:
+                        count = code.count(n_gram)
+                        n_gram_count_list.append(count)
+                    writer.writerow(n_gram_count_list)
+                else:
+                    continue
 
 
 def main():
