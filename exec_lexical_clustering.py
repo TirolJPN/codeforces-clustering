@@ -114,8 +114,6 @@ class ExecLexicalCluster(Connector):
 
 
 
-
-
 def main():
     args = sys.argv
     # 引数がなければそのまま終了
