@@ -51,8 +51,6 @@ class visualizeClustering(Connector.Connector):
 
 
 
-
-
     def make_directory(self, problem_id, metric, method, index_lexical_cluster):
         PATH_COPY_DIRECTORY = '%s%s/%s/%s/result/%s/' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, index_lexical_cluster)
         if not os.path.isdir(PATH_COPY_DIRECTORY):
