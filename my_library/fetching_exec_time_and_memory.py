@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
 実行時に引数がproblem_idを表す引数が必要
 
