@@ -14,6 +14,7 @@ lexicalな方法で3つのファイルに、metricalな方法でインデック�
 """
 
 import sys
+import csv
 from my_library import key
 
 class ExecCreateBoxPlotCSV():
@@ -28,14 +29,25 @@ class ExecCreateBoxPlotCSV():
         self.NUM_METRICAL_CLUSTERS = key.NUM_METRICAL_CLUSTERS
 
         self.METRICS = ['cosine']
-        self.METHODS = ['single', 'average', 'complete', 'weighted']
+        # self.METHODS = ['single', 'average', 'complete', 'weighted']
+        self.METHODS = ['complete']
         self.RANGE_LEXICAL_CLUSTER = range(1, self.NUM_LEXICAL_CLUSTERS + 1)
         self.RANGE_METRICAL_CLUSTER = range(1, self.NUM_METRICAL_CLUSTERS + 1)
 
         # read 3 target csv files
         # the name of target csv is like [pronlem_id]_[lexical_id].csv
-        for lexical_id in self.RANGE_LEXICAL_CLUSTER:
-            print(lexical_id)
+        for metric in self.METRICS:
+            for method in self.METHODS:
+                for lexical_id in self.RANGE_LEXICAL_CLUSTER:
+                    # print(lexical_id)
+                    INDEXED_CSV_NAME = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, lexical_id)
+                    with open(INDEXED_CSV_NAME, "r", encoding="utf-8") as INDEXED_CSV:
+                        INDEXED_CSV_F = csv.reader(INDEXED_CSV, delimiter=",", lineterminator="\n")
+                        next(INDEXED_CSV_F)
+                        for row_indexed_csv in INDEXED_CSV_F:
+                            print(row_indexed_csv)
+                     
+
 
 
 
