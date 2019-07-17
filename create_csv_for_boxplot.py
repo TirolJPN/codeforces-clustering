@@ -15,6 +15,7 @@ lexicalな方法で3つのファイルに、metricalな方法でインデック�
 
 import sys
 import csv
+import pandas as pd
 from my_library import key
 
 class ExecCreateBoxPlotCSV():
@@ -34,22 +35,31 @@ class ExecCreateBoxPlotCSV():
         self.RANGE_LEXICAL_CLUSTER = range(1, self.NUM_LEXICAL_CLUSTERS + 1)
         self.RANGE_METRICAL_CLUSTER = range(1, self.NUM_METRICAL_CLUSTERS + 1)
 
-        # read 3 target csv files
-        # the name of target csv is like [pronlem_id]_[lexical_id].csv
-        for metric in self.METRICS:
-            for method in self.METHODS:
-                for lexical_id in self.RANGE_LEXICAL_CLUSTER:
-                    # print(lexical_id)
-                    INDEXED_CSV_NAME = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, lexical_id)
-                    with open(INDEXED_CSV_NAME, "r", encoding="utf-8") as INDEXED_CSV:
-                        INDEXED_CSV_F = csv.reader(INDEXED_CSV, delimiter=",", lineterminator="\n")
-                        next(INDEXED_CSV_F)
-                        for row_indexed_csv in INDEXED_CSV_F:
-                            print(row_indexed_csv)
-                     
+        metric_values_list = self.load_mtric_values(problem_id)
+        print(metric_values_list)
+        if not(metric_values_list.empty):
+            for metric in self.METRICS:
+                for method in self.METHODS:
+                    for lexical_id in self.RANGE_LEXICAL_CLUSTER:
+                        # read 3 target csv files
+                        # the name of target csv is like [pronlem_id]_[lexical_id].csv
+                        INDEXED_CSV_NAME = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, lexical_id)
+                        with open(INDEXED_CSV_NAME, "r", encoding="utf-8") as INDEXED_CSV:
+                            INDEXED_CSV_F = csv.reader(INDEXED_CSV, delimiter=",", lineterminator="\n")
+                            next(INDEXED_CSV_F)
+                            # for row_indexed_csv in INDEXED_CSV_F:
+                            #     print("row_indexed_csv[3]")
+        else:
+            sys.exit()
 
-
-
+    # function to read metric values
+    def load_mtric_values(self, problem_id):
+        METRIC_VALUES_CSV_NAME = '%s%s.csv' % (self.PATH_METRIC_VALUES, problem_id)
+        try:
+            df = pd.read_csv(METRIC_VALUES_CSV_NAME, delimiter=",")
+            return df
+        except:
+            return pd.DataFrame(index=[], columns=cols)
 
 def main():
     args = sys.argv
