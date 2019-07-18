@@ -35,11 +35,14 @@ class ExecCreateBoxPlotCSV():
         self.RANGE_LEXICAL_CLUSTER = range(1, self.NUM_LEXICAL_CLUSTERS + 1)
         self.RANGE_METRICAL_CLUSTER = range(1, self.NUM_METRICAL_CLUSTERS + 1)
 
+        pd.set_option('display.max_rows', 500)
+
         metric_values_list_df = self.load_mtric_values(problem_id)
         print(metric_values_list_df)
         if not(metric_values_list_df.empty):
             for metric in self.METRICS:
                 for method in self.METHODS:
+                    result_df = pd.DataFrame(index=[], columns=[])
                     for lexical_id in self.RANGE_LEXICAL_CLUSTER:
                         
                         # read 3 target csv files
@@ -47,12 +50,22 @@ class ExecCreateBoxPlotCSV():
                         try:
                             INDEXED_CSV_NAME = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, lexical_id)
                             target_indexed_csv_df = pd.read_csv(INDEXED_CSV_NAME, delimiter=",")
-                            # print(target_indexed_csv_df)
-                            # tmp_df = pd.merge(target_indexed_csv_df, metric_values_list_df, on='submission_id')
+                            print(target_indexed_csv_df)
+                            tmp_df = pd.merge(target_indexed_csv_df, metric_values_list_df, on='submission_id')
                             # print(tmp_df)
+                            result_df = pd.concat([result_df, tmp_df], ignore_index=True)
                         except:
-                            print("cannot read df")
-                        # merge two target dfs
+                            print("cannot read indexed csv")
+                    result_df = result_df.sort_values(by=["lexical_id", "metrical_id"], ascending=True)
+                    print(result_df)
+                    if not(result_df.empty):
+                        RESULT_CSV_NAME = '%s%s/%s/%s/%s_boxplot.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+                        try:
+                            read_csv.to_csv(RESULT_CSV_NAME)
+                        except:
+                            print("cannot write to csv")
+
+
 
                         
 
