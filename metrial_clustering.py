@@ -41,7 +41,6 @@ class ExecNetricalClustering():
                     target_submission_id_list = tmp_df['submission_id'].values.tolist()
                     # 語彙的特徴で分類を行った対象のsubmission_idの一覧を取得する
 
-
                     # 探索対象のdfをこれに追加していく
                     data_frame = pd.DataFrame(index=[], columns=['submission_id', 'M0', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M9', 'M11', 'M12', 'M13', 'M14'])
                     src_list_df = []
