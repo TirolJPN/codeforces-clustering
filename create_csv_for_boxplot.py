@@ -35,22 +35,26 @@ class ExecCreateBoxPlotCSV():
         self.RANGE_LEXICAL_CLUSTER = range(1, self.NUM_LEXICAL_CLUSTERS + 1)
         self.RANGE_METRICAL_CLUSTER = range(1, self.NUM_METRICAL_CLUSTERS + 1)
 
-        metric_values_list = self.load_mtric_values(problem_id)
-        print(metric_values_list)
-        if not(metric_values_list.empty):
+        metric_values_list_df = self.load_mtric_values(problem_id)
+        print(metric_values_list_df)
+        if not(metric_values_list_df.empty):
             for metric in self.METRICS:
                 for method in self.METHODS:
                     for lexical_id in self.RANGE_LEXICAL_CLUSTER:
+                        
                         # read 3 target csv files
                         # the name of target csv is like [pronlem_id]_[lexical_id].csv
-                        INDEXED_CSV_NAME = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, lexical_id)
-                        with open(INDEXED_CSV_NAME, "r", encoding="utf-8") as INDEXED_CSV:
-                            INDEXED_CSV_F = csv.reader(INDEXED_CSV, delimiter=",", lineterminator="\n")
-                            next(INDEXED_CSV_F)
-                            # for row_indexed_csv in INDEXED_CSV_F:
-                            #     print("row_indexed_csv[3]")
-        else:
-            sys.exit()
+                        try:
+                            INDEXED_CSV_NAME = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, lexical_id)
+                            target_indexed_csv_df = pd.read_csv(INDEXED_CSV_NAME, delimiter=",")
+                            # print(target_indexed_csv_df)
+                            # tmp_df = pd.merge(target_indexed_csv_df, metric_values_list_df, on='submission_id')
+                            # print(tmp_df)
+                        except:
+                            print("cannot read df")
+                        # merge two target dfs
+
+                        
 
     # function to read metric values
     def load_mtric_values(self, problem_id):
