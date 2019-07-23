@@ -61,7 +61,7 @@ class ExecCreateBoxPlotCSV():
                     if not(result_df.empty):
                         RESULT_CSV_NAME = '%s%s/%s/%s/%s_boxplot.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
                         try:
-                            read_csv.to_csv(RESULT_CSV_NAME)
+                            result_df.to_csv(RESULT_CSV_NAME)
                         except:
                             print("cannot write to csv")
 
