@@ -39,7 +39,8 @@ class FilesCreater(Connector.Connector):
                     f_ngweight.write(chr(2))
                     f_ngweight.write(answer['file_name'])
                     f_ngweight.write(chr(3))
-                    s = self.filter_cpp_comment(code_content)
+                    # s = self.filter_cpp_comment(code_content)
+                    s = code_content
                     # 特殊記号をとりあえず空白に変換する
                     # processed_s = re.sub("\!|\?|\"|\'|#|\$|%|&|\||\(|\)|\{|\}|\[|\]|=|<|>|\+|-|\*|\/|\\|\~|\^|@|:|;|,|\.|\s+", " ", s)
                     processed_s = re.sub("\s+", " ", s)

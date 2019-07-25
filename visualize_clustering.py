@@ -63,14 +63,17 @@ class visualizeClustering(Connector.Connector):
     # 与えられた引数から該当するsubmission_idとmetrical_indexの一覧を取得する
     def get_src_list(self, problem_id, metric, method, index_lexical_cluster):
         PATH_CSV = '%s%s/%s/%s/%s_%s.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id, index_lexical_cluster)
-        with open(PATH_CSV, "r", encoding="utf-8") as csv_reader:
-            f = csv.reader(csv_reader, delimiter=',', lineterminator="\n")
-            next(f)
-            src_list = []
-            for row in f:
-                src_list.append([row[1], row[3]])
-        return src_list
+        try:
+            with open(PATH_CSV, "r", encoding="utf-8") as csv_reader:
+                f = csv.reader(csv_reader, delimiter=',', lineterminator="\n")
+                next(f)
+                src_list = []
+                for row in f:
+                    src_list.append([row[1], row[3]])
+            return src_list
 
+        except Exception as e:
+            return []
 
 
 

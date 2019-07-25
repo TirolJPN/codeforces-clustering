@@ -20,39 +20,43 @@ class ExecLexicalCluster():
 
         
         path_csv_file = self.PATH_VECTOR_FILES + problem_id + '.csv'
-        df = pd.read_csv(path_csv_file, delimiter=",", )
-        length_culumns = len(df.columns)
-        x = df.iloc[:,1:length_culumns]
+        try:
+            df = pd.read_csv(path_csv_file, delimiter=",", )
+            length_culumns = len(df.columns)
+            x = df.iloc[:,1:length_culumns]
 
 
-        for metric in self.METRICS:
-            for method in self.METHODS:
-                try:
+            for metric in self.METRICS:
+                for method in self.METHODS:
+                    try:
 
-                    '''
-                    階層クラスタリングを行い、プロット
-                    reference: https://joernhees.de/blog/2015/08/26/scipy-hierarchicalclustering-and-dendrogram-tutorial/
-                    '''
-                    result = linkage(x,
-                                    metric = metric,
-                                    method = method)
-                    dendrogram(
-                        result,
-                        truncate_mode='lastp',  # show only the last p merged clusters
-                        p=20,  # show only the last p merged clusters
-                        leaf_rotation=90.,
-                        leaf_font_size=12.,
-                        show_contracted=True,  # to get a distribution impression in truncated branches
-                    )
-                    cluster_index = fcluster(result, self.NUM_LEXICAL_CLUSTERS, criterion='maxclust')
-                    
-                    path_cluster_index = '%s%s/%s/%s/%s.npy' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
-                    np.save(path_cluster_index, cluster_index)
-                    print(cluster_index)
-                    self.make_index_csv(problem_id, metric, method, df.iloc[:,0:1], cluster_index)
-                except Exception as e:
-                    print(e)
-                    continue
+                        '''
+                        階層クラスタリングを行い、プロット
+                        reference: https://joernhees.de/blog/2015/08/26/scipy-hierarchicalclustering-and-dendrogram-tutorial/
+                        '''
+                        result = linkage(x,
+                                        metric = metric,
+                                        method = method)
+                        dendrogram(
+                            result,
+                            truncate_mode='lastp',  # show only the last p merged clusters
+                            p=20,  # show only the last p merged clusters
+                            leaf_rotation=90.,
+                            leaf_font_size=12.,
+                            show_contracted=True,  # to get a distribution impression in truncated branches
+                        )
+                        cluster_index = fcluster(result, self.NUM_LEXICAL_CLUSTERS, criterion='maxclust')
+                        
+                        path_cluster_index = '%s%s/%s/%s/%s.npy' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
+                        np.save(path_cluster_index, cluster_index)
+                        print(cluster_index)
+                        self.make_index_csv(problem_id, metric, method, df.iloc[:,0:1], cluster_index)
+                    except Exception as e:
+                        print(e)
+                        continue
+        except Exception as e:
+                print(e)
+                continue
 
 
     def make_directories(self, problem_id):
