@@ -48,8 +48,7 @@ class ExecLexicalCluster():
                     print(cluster_index)
                     self.make_index_csv(problem_id, metric, method, df.iloc[:,0:1], cluster_index)
         except Exception as e:
-                print(e)
-                continue
+            print(e)
 
 
     def make_directories(self, problem_id):

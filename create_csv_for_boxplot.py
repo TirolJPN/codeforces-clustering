@@ -54,10 +54,10 @@ class ExecCreateBoxPlotCSV():
                             tmp_df = pd.merge(target_indexed_csv_df, metric_values_list_df, on='submission_id')
                             # print(tmp_df)
                             result_df = pd.concat([result_df, tmp_df], ignore_index=True)
+                            result_df = result_df.sort_values(by=["lexical_id", "metrical_id"], ascending=True)
+                            print(result_df)
                         except:
-                            print("cannot read indexed csv")
-                    result_df = result_df.sort_values(by=["lexical_id", "metrical_id"], ascending=True)
-                    print(result_df)
+                            print("cannot read indexed csv or there is problem to pd")
                     if not(result_df.empty):
                         RESULT_CSV_NAME = '%s%s/%s/%s/%s_boxplot.csv' % (self.PATH_PLOT_RESULTS, problem_id, metric, method, problem_id)
                         try:
