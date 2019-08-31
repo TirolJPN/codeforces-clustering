@@ -1,15 +1,23 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn import datasets
 from sklearn.manifold import TSNE
 
 digits = datasets.load_digits()
 
-# print digits.data.shape
+np.set_printoptions(threshold=np.inf)
+
+print(digits.data.shape)
 # (1797, 64)
-
-# print digits.target.shape
+print (digits.target.shape)
 # (1797,)
+print(digits.data)
+print(type(digits.data))
+print(digits.target)
+print(type(digits.target))
+exit()
 
+# n_component: Dimension of the embeded space
 X_reduced = TSNE(n_components=2, random_state=0).fit_transform(digits.data)
 
 # print X_reduced.shape
