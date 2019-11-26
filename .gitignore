@@ -6,3 +6,4 @@ venv/
 ./figure.png
 *.png
 *.txt
+.pyc
