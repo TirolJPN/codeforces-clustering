@@ -7,7 +7,7 @@ import shutil
 
 
 # インデックス付けしたcsvを参照してフォルダ分けする
-class visualizeClustering(Connector.Connector):
+class SaveClustering(Connector.Connector):
     def __init__(self, problem_id):
         super().__init__()
 
@@ -109,7 +109,7 @@ def main():
     args = sys.argv
     if len(args) > 0:
         for problem_id in args[1:]:
-            visualizeClustering(problem_id)
+            SaveClustering(problem_id)
 
 
 if __name__ == "__main__":

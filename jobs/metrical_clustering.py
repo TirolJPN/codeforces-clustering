@@ -7,7 +7,7 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 import numpy as np
 from scipy.cluster.hierarchy import fcluster
 
-class ExecNetricalClustering():
+class ExecMetricalClustering():
 
     def __init__(self, problem_id):
         # 各定数の初期化
@@ -103,7 +103,7 @@ def main():
     args = sys.argv
     if len(args) > 1:
         for problem_id in args[1:]:
-            ExecNetricalClustering(problem_id)
+            ExecMetricalClustering(problem_id)
 
 if __name__ == "__main__":
     main()

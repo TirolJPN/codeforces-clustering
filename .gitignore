@@ -1,12 +1,11 @@
 ./__pycache__/
-my_library/__pycache__/
+my_library/__pycache__/*
 my_library/.env
 sql_memo.txt
 venv/
 ./figure.png
 *.png
 *.txt
-.pyc
+*.pyc
 .env
-.pyc
 .vscode/*
