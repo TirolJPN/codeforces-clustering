@@ -20,7 +20,8 @@ class ExecNetricalClustering():
         self.NUM_METRICAL_CLUSTERS = key.NUM_METRICAL_CLUSTERS
 
         self.METRICS = ['cosine']
-        self.METHODS = ['single', 'average', 'complete', 'weighted']
+        # self.METHODS = ['single', 'average', 'complete', 'weighted']
+        self.METHODS = ['complete']
         self.RANGE_LEXICAL_CLUSTER = range(1, self.NUM_LEXICAL_CLUSTERS + 1)
         self.RANGE_METRICAL_CLUSTER = range(1, self.NUM_METRICAL_CLUSTERS + 1)
 
