@@ -14,7 +14,8 @@ class ExecLexicalCluster():
         self.NUM_LEXICAL_CLUSTERS = key.NUM_LEXICAL_CLUSTERS
         self.PATH_METRIC_VALUES = key.PATH_METRIC_VALUES 
         self.METRICS = ['cosine']
-        self.METHODS = ['single', 'average', 'complete', 'weighted']
+        # self.METHODS = ['single', 'average', 'complete', 'weighted']
+        self.METHODS = ['complete']
 
         self.make_directories(problem_id)
 

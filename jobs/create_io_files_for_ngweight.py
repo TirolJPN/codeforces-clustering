@@ -26,6 +26,10 @@ class FilesCreater(Connector.Connector):
         PATH_FEATURE_WORD_VECTORS = key.PATH_FEATURE_WORD_VECTORS
         PATH_SRC = key.PATH_SRC
         path_file = PATH_FEATURE_WORD_VECTORS + problem_id + '.txt'
+        PATH_INPUT_FILES = key.PATH_INPUT_FILES
+        PATH_OUTPUT_FILES = key.PATH_OUTPUT_FILES
+
+        PATH_NGWEIGHT_EXE = key.PATH_NGWEIGHT_EXE
         # 入力ファイルがまだ作成されていなければ実行する
         if not os.path.isfile(path_file):
             answers = self.get_right_answers(problem_id)
@@ -48,7 +52,7 @@ class FilesCreater(Connector.Connector):
                     processed_s = re.sub(r" +", " ", processed_s)
                     f_ngweight.write(processed_s)
             # pythonスクリプトからngweightを直接実行し、出力ファイルを得る
-            cmd = "../../2018-research/ngweight/bin/default/ngweight -w -s 0 < ../clustering_result/ngweight_input_files/%s.txt > ../clustering_result/ngweight_output_files/%s_output" % (problem_id, problem_id)
+            cmd = PATH_NGWEIGHT_EXE + " -w -s 0 < " +  PATH_INPUT_FILES + "%s.txt > " % problem_id + PATH_OUTPUT_FILES +  "%s_output" % problem_id
             res = subprocess.run([cmd], stdout=subprocess.PIPE, shell=True)
             sys.stdout.buffer.write(res.stdout)
 

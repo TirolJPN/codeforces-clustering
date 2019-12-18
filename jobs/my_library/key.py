@@ -12,6 +12,7 @@ DB_PASSWORD = os.environ.get("DB_PASSWORD")
 DB_PORT = os.environ.get("DB_PORT")
 DB_DATABASE = os.environ.get("DB_DATABASE") 
 
+PATH_NGWEIGHT_EXE = os.environ.get("PATH_NGWEIGHT_EXE")
 PATH_FEATURE_WORD_VECTORS = os.environ.get("PATH_FEATURE_WORD_VECTORS")
 PATH_SRC = os.environ.get("PATH_SRC")
 PATH_INPUT_FILES = os.environ.get("PATH_INPUT_FILES")

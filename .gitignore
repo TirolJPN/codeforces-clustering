@@ -6,3 +6,7 @@ venv/
 ./figure.png
 *.png
 *.txt
+.pyc
+.env
+.pyc
+.vscode/*
